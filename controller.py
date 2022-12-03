@@ -95,20 +95,20 @@ class Controller(QMainWindow, Ui_Dialog):
                     raise TypeError'''
                 if self.operation == "addition":
                     result = var1 + var2
-                    self.LabelResult.setText("%s + %s = " % (var1, var2))
-                    self.TextStorage.setText(result)
+                    self.LabelResult.setText("%s / %s = %s" % (var1, var2, result))
+                    self.TextStorage.setText(str(result))
                 elif self.operation == "subtraction":
                     result = var1 - var2
-                    self.LabelResult.setText("%s - %s = " % (var1, var2))
-                    self.TextStorage.setText(result)
+                    self.LabelResult.setText("%s / %s = %s" % (var1, var2, result))
+                    self.TextStorage.setText(str(result))
                 elif self.operation == "multiplication":
                     result = var1 * var2
-                    self.LabelResult.setText("%s * %s = " % (var1, var2))
-                    self.TextStorage.setText(result)
+                    self.LabelResult.setText("%s / %s = %s" % (var1, var2, result))
+                    self.TextStorage.setText(str(result))
                 elif self.operation == "division":
                     result = var1 / var2
-                    self.LabelResult.setText("%s / %s = " % (var1, var2))
-                    self.TextStorage.setText(result)
+                    self.LabelResult.setText("%s / %s = %s" % (var1, var2, result))
+                    self.TextStorage.setText(str(result))
 
             except ValueError:
                 self.TextStorage.setText("")
