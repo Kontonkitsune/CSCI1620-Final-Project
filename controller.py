@@ -12,8 +12,7 @@ import random
 class Controller(QMainWindow, Ui_Dialog):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.var1 = 0
-        self.var2 = 0
+        self.var1 = None
         self.operation = "None"
 
         self.setupUi(self)
@@ -31,7 +30,9 @@ class Controller(QMainWindow, Ui_Dialog):
         self.LabelResult.hide()
 
     def division(self):
-        """Readies calculator for division."""
+        """Readies calculator for division. If something is already being calculated, it will calculate first."""
+        if self.var1 is not None:
+            self.calculate()
         self.var1 = self.TextStorage.toPlainText()
         self.LabelResult.setText(self.TextStorage.toPlainText() + " /")
         self.operation = "division"
@@ -39,23 +40,19 @@ class Controller(QMainWindow, Ui_Dialog):
         self.LabelResult.show()
 
     def addition(self):
-        """Readies calculator for addition."""
-        print("a")
+        """Readies calculator for addition. If something is already being calculated, it will calculate first."""
+        if self.var1 is not None:
+            self.calculate()
         self.var1 = self.TextStorage.toPlainText()
-        print("b")
         self.LabelResult.setText("%s +" % (self.TextStorage.toPlainText()))
-
-        print("a")
         self.operation = "addition"
-
-        print("b")
         self.TextStorage.setText("")
-
-        print("a")
         self.LabelResult.show()
 
     def subtraction(self):
-        """Readies calculator for subtraction."""
+        """Readies calculator for subtraction. If something is already being calculated, it will calculate first."""
+        if self.var1 is not None:
+            self.calculate()
         self.var1 = self.TextStorage.toPlainText()
         self.LabelResult.setText(self.TextStorage.toPlainText() + " -")
         self.operation = "subtraction"
@@ -63,7 +60,9 @@ class Controller(QMainWindow, Ui_Dialog):
         self.LabelResult.show()
 
     def multiplication(self):
-        """Readies calculator for multiplication."""
+        """Readies calculator for multiplication. If something is already being calculated, it will calculate first."""
+        if self.var1 is not None:
+            self.calculate()
         self.var1 = self.TextStorage.toPlainText()
         self.LabelResult.setText(self.TextStorage.toPlainText() + " *")
         self.operation = "multiplication"
@@ -71,13 +70,19 @@ class Controller(QMainWindow, Ui_Dialog):
         self.LabelResult.show()
 
     def clearInputs(self):
+        """Clears inputs"""
         self.TextStorage.setText("")
         self.LabelResult.setText("")
         self.operation = "None"
-        self.var1 = 0
+        self.var1 = None
         self.LabelResult.hide()
 
     def calculate(self):
+        """
+        Function does calculations based on self.operator, self.var1 and input from TextStorage
+        Outputs the result of the calculation onto TextStorage, and the equation for the answer onto LabelResult
+        :return: nothing
+        """
         print("a")
         if self.operation == "None":
             self.TextStorage.setText("")
