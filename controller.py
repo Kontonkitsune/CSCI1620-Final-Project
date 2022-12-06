@@ -6,6 +6,7 @@ Code shamelessly ripped from Lab 10
 
 from PyQt5.QtWidgets import *
 from view import *
+from functions import *
 import random
 
 
@@ -13,119 +14,131 @@ class Controller(QMainWindow, Ui_Dialog):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.var1 = None
-        self.operation = "None"
+        self.var2 = None
+        self.var3 = None  # to store previous results.
+        self.operation = None
 
         self.setupUi(self)
 
         self.setFixedSize(285, 432)
 
-        self.ButtonCalc.clicked.connect(lambda: self.calculate())
+        self.ButtonCalc.clicked.connect(lambda: self.calculate(True))
         self.ButtonClear.clicked.connect(lambda: self.clearInputs())
-        self.ButtonDivide.clicked.connect(lambda: self.division())
-        self.ButtonMultiply.clicked.connect(lambda: self.multiplication())
-        self.ButtonPlus.clicked.connect(lambda: self.addition())
-        self.ButtonMinus.clicked.connect(lambda: self.subtraction())
+        self.ButtonPlus.clicked.connect(lambda: self.update_calc_text("+"))
+        self.ButtonMinus.clicked.connect(lambda: self.update_calc_text("-"))
+        self.ButtonMultiply.clicked.connect(lambda: self.update_calc_text("*"))
+        self.ButtonDivide.clicked.connect(lambda: self.update_calc_text("/"))
         self.TextStorage.setText("")
         self.LabelResult.setText("")
         self.LabelResult.hide()
 
-    def division(self):
-        """Readies calculator for division. If something is already being calculated, it will calculate first."""
+    def update_calc_text(self, a: str) -> None:
+        """Just updates the text stuff. Used with operation buttons."""
         if self.var1 is not None:
             self.calculate()
+        self.operation = a
+        print(a)
         self.var1 = self.TextStorage.toPlainText()
-        self.LabelResult.setText(self.TextStorage.toPlainText() + " /")
-        self.operation = "division"
+        self.var2 = None
+        self.var3 = None
+        self.LabelResult.setText(f"{simp(self.TextStorage.toPlainText())} {self.operation}")
         self.TextStorage.setText("")
         self.LabelResult.show()
 
-    def addition(self):
-        """Readies calculator for addition. If something is already being calculated, it will calculate first."""
-        if self.var1 is not None:
-            self.calculate()
-        self.var1 = self.TextStorage.toPlainText()
-        self.LabelResult.setText("%s +" % (self.TextStorage.toPlainText()))
-        self.operation = "addition"
-        self.TextStorage.setText("")
-        self.LabelResult.show()
-
-    def subtraction(self):
-        """Readies calculator for subtraction. If something is already being calculated, it will calculate first."""
-        if self.var1 is not None:
-            self.calculate()
-        self.var1 = self.TextStorage.toPlainText()
-        self.LabelResult.setText(self.TextStorage.toPlainText() + " -")
-        self.operation = "subtraction"
-        self.TextStorage.setText("")
-        self.LabelResult.show()
-
-    def multiplication(self):
-        """Readies calculator for multiplication. If something is already being calculated, it will calculate first."""
-        if self.var1 is not None:
-            self.calculate()
-        self.var1 = self.TextStorage.toPlainText()
-        self.LabelResult.setText(self.TextStorage.toPlainText() + " *")
-        self.operation = "multiplication"
-        self.TextStorage.setText("")
-        self.LabelResult.show()
-
-    def clearInputs(self):
+    def clearInputs(self) -> None:
         """Clears inputs"""
         self.TextStorage.setText("")
         self.LabelResult.setText("")
-        self.operation = "None"
+        self.operation = None
         self.var1 = None
+        self.var2 = None
+        self.var3 = None
         self.LabelResult.hide()
 
-    def calculate(self):
+    def calc_fail(self):
+        self.TextStorage.setText("")
+        self.LabelResult.setText("Something went really wrong :(")
+        self.LabelResult.show()
+
+    def calculate(self, standalone: bool = False) -> None:
         """
         Function does calculations based on self.operator, self.var1 and input from TextStorage
         Outputs the result of the calculation onto TextStorage, and the equation for the answer onto LabelResult
-        :return: nothing
-        """
-        print("a")
-        if self.operation == "None":
-            self.TextStorage.setText("")
-            self.LabelResult.setText("Something went wrong :(")
-            self.LabelResult.show()
 
+        :param standalone: Boolean. Whether the function is being run by the Calculate button or another button.
+        :return: No return
+        """
+
+        if standalone:
+            self.var2 = self.TextStorage.toPlainText() if self.var2 is None else self.var2
+        else:
+            self.var3 = None
+
+        if self.operation is None:
+            self.calc_fail()
         else:
             try:
-                var1 = float(self.var1)
-                var2 = float(self.TextStorage.toPlainText())
+                var1 = float(self.var3 if self.var3 is not None and standalone else self.var1)
+                var2 = float(self.var2 if standalone else self.TextStorage.toPlainText())
                 result = 0
-                '''if random.randint(1,3) == 1:
+
+                if random.randint(1, 5) == 1:  # program will occasionally act as though you input a string
                     raise ValueError
-                if random.randint(1,20) == 1:
-                    raise TypeError'''
-                if self.operation == "addition":
+
+                if self.operation == "+":
                     result = var1 + var2
-                    self.LabelResult.setText("%s / %s = %s" % (var1, var2, result))
-                    self.TextStorage.setText(str(result))
-                elif self.operation == "subtraction":
+                elif self.operation == "-":
                     result = var1 - var2
-                    self.LabelResult.setText("%s / %s = %s" % (var1, var2, result))
-                    self.TextStorage.setText(str(result))
-                elif self.operation == "multiplication":
+                elif self.operation == "*":
                     result = var1 * var2
-                    self.LabelResult.setText("%s / %s = %s" % (var1, var2, result))
-                    self.TextStorage.setText(str(result))
-                elif self.operation == "division":
+                elif self.operation == "/":
                     result = var1 / var2
-                    self.LabelResult.setText("%s / %s = %s" % (var1, var2, result))
-                    self.TextStorage.setText(str(result))
+                else:
+                    raise TypeError  # simple way to exit loop
+
+                self.LabelResult.setText(f"{simp(var1)} {self.operation} {simp(var2)} = "
+                                         f"{simp(result)}")
+                self.TextStorage.setText(simp(result))
+                if standalone:
+                    self.var3 = result
+                    self.var1 = None
 
             except ValueError:
-                self.TextStorage.setText("")
-                self.LabelResult.setText("Something went wrong :(")
-                self.LabelResult.show()
-                self.operation = "None"
+                try:
+                    var1 = self.var3 if self.var3 is not None and standalone else self.var1
+                    var2 = self.var2 if standalone else self.TextStorage.toPlainText()
+                    result = 0
+
+                    if self.operation == "+":
+                        result = crazy_addition(var1, var2)  # literally tacks on the number to the string
+                    elif self.operation == "-":
+                        result = crazy_subtraction(var1, var2)
+                    elif self.operation == "*":
+                        result = crazy_multiplication(var1, var2)
+                    elif self.operation == "/":
+                        result = crazy_division(var1, var2)
+                    else:
+                        raise TypeError  # quick way to just end the code happening.
+
+                    self.LabelResult.setText(f"{simp(var1)} {self.operation} {simp(var2)} = "
+                                             f"{simp(result)}")
+                    self.TextStorage.setText(simp(result))
+                    if standalone:
+                        self.var3 = result
+                        self.var1 = None
+                except ValueError:
+                    self.calc_fail()
+                except TypeError:
+                    self.calc_fail()
 
             except TypeError:
-                self.TextStorage.setText("")
-                self.LabelResult.setText("Something went really wrong :(")
+                self.calc_fail()
+
+            except ZeroDivisionError:
+                var1 = self.var1
+                var2 = self.TextStorage.toPlainText()
+                self.LabelResult.setText(f"{simp(var1)} {self.operation} {simp(var2)} = "
+                                         f"Undefined")
+                self.TextStorage.setText("Undefined")
                 self.LabelResult.show()
                 self.operation = "None"
-
-
-
