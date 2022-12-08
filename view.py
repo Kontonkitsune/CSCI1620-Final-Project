@@ -52,7 +52,7 @@ class Ui_Dialog(object):
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Test 10"))
+        Dialog.setWindowTitle(_translate("Dialog", "Bad Calculator"))
         self.ButtonCalc.setText(_translate("Dialog", "Calculate"))
         self.ButtonClear.setText(_translate("Dialog", "Clear"))
         self.LabelTitle.setText(_translate("Dialog", "<html><head/><body><p><span style=\" font-size:14pt; font-weight:600;\">Bad Calculator</span></p></body></html>"))
